@@ -1,5 +1,6 @@
-import { toggleTheme } from '@lib/toggleTheme';
+import { manipulateSizes } from '@lib/manipulateSizes';
 
 console.log('content script loaded');
 
-void toggleTheme();
+// Fetch and log the selected sizes
+void manipulateSizes();
