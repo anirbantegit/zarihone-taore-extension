@@ -7,7 +7,7 @@ const Login = ({ onLogin }: { onLogin: () => void }) => {
   const handleLogin = async () => {
     const userData = await userAuthStorage.get();
     if (userData.email === email) {
-      onLogin(); // Notify parent component to proceed to the dashboard
+      onLogin();
     } else {
       alert('Invalid email');
     }

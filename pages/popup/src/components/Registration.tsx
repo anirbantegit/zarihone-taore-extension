@@ -7,7 +7,7 @@ const Registration = ({ onRegister }: { onRegister: () => void }) => {
 
   const handleRegister = async () => {
     await userAuthStorage.login(username, email);
-    onRegister(); // Notify parent component to proceed to the dashboard
+    onRegister();
   };
 
   return (

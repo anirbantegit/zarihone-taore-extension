@@ -55,7 +55,6 @@ export async function handleMyntraCategory() {
           // Re-encode the updated filter
           updatedFilter = encodeURIComponent(updatedParts.join('::'));
         } else {
-          // If there is no filter in the URL, add the size_facet
           updatedFilter = encodeURIComponent(`size_facet:${selectedSize}`);
         }
 
