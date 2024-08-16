@@ -1,57 +1,50 @@
+import { useEffect, useState } from 'react';
+import { userAuthStorage } from '@extension/storage';
+import Registration from './components/Registration';
+import Login from './components/Login';
+import Dashboard from './components/Dashboard';
 import '@src/Popup.css';
-import { useStorageSuspense, withErrorBoundary, withSuspense } from '@extension/shared';
-import { exampleThemeStorage } from '@extension/storage';
-import { ComponentPropsWithoutRef } from 'react';
 
 const Popup = () => {
-  const theme = useStorageSuspense(exampleThemeStorage);
-  const isLight = theme === 'light';
-  const logo = isLight ? 'popup/logo_vertical.svg' : 'popup/logo_vertical_dark.svg';
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
-  const injectContentScript = async () => {
-    const [tab] = await chrome.tabs.query({ currentWindow: true, active: true });
+  useEffect(() => {
+    // Check if the user is already logged in
+    userAuthStorage.isLoggedIn().then(setIsLoggedIn);
+  }, []);
 
-    await chrome.scripting.executeScript({
-      target: { tabId: tab.id! },
-      files: ['content-runtime/index.iife.js'],
-    });
+  const handleRegister = () => {
+    setIsLoggedIn(true);
+  };
+
+  const handleLogin = () => {
+    setIsLoggedIn(true);
   };
 
   return (
-    <div className={`App ${isLight ? 'bg-slate-50' : 'bg-gray-800'}`}>
-      <header className={`App-header ${isLight ? 'text-gray-900' : 'text-gray-100'}`}>
-        <img src={chrome.runtime.getURL(logo)} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>pages/popup/src/Popup.tsx</code>
-        </p>
-        <button
-          className={
-            'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
-            (isLight ? 'bg-blue-200 text-black' : 'bg-gray-700 text-white')
-          }
-          onClick={injectContentScript}>
-          Click to inject Content Script
-        </button>
-        <ToggleButton>Toggle theme</ToggleButton>
+    <div className="App">
+      <header className="App-header">
+        {!isLoggedIn ? (
+          showLogin ? (
+            <Login onLogin={handleLogin} />
+          ) : (
+            <Registration onRegister={handleRegister} />
+          )
+        ) : (
+          <Dashboard />
+        )}
+        {!isLoggedIn && (
+          <button
+            className="mt-4 p-2 text-sm text-blue-500 underline"
+            onClick={() => setShowLogin((prev) => !prev)}
+          >
+            {showLogin ? 'Need to Register?' : 'Already Registered? Login'}
+          </button>
+        )}
       </header>
     </div>
   );
 };
 
-const ToggleButton = (props: ComponentPropsWithoutRef<'button'>) => {
-  const theme = useStorageSuspense(exampleThemeStorage);
-  return (
-    <button
-      className={
-        props.className +
-        ' ' +
-        'font-bold mt-4 py-1 px-4 rounded shadow hover:scale-105 ' +
-        (theme === 'light' ? 'bg-white text-black shadow-black' : 'bg-black text-white')
-      }
-      onClick={exampleThemeStorage.toggle}>
-      {props.children}
-    </button>
-  );
-};
-
-export default withErrorBoundary(withSuspense(Popup, <div> Loading ... </div>), <div> Error Occur </div>);
+export default Popup;
